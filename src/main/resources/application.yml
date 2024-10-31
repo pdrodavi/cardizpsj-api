@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: cardizpsj
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${DATABASE_USERNAME:pedev}
+    url: ${DATABASE_URL:jdbc:postgresql://pedrodavi.com:32678/postgres}
+    password: ${DATABASE_PASSWORD:pedev}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: 'false'
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+
+server:
+  servlet:
+    context-path: /tithe-management/v1
+  port: ${PORT:8080}
+
+logging:
+  level:
+    root: info
+    org.springframework.web: info
+    org.hibernate: error
