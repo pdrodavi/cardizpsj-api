@@ -38,12 +38,6 @@ public class CarnesController {
                 dizimista.setNome(dizimista1.getNome());
             }
         }
-//        if (searchBy.equals("code")) {
-//            ResponseEntity<Dizimista> dizimistaResponseEntity = dizimistaService.findByCode(Long.valueOf(id))
-//                    .map(ResponseEntity::ok)
-//                    .orElse(ResponseEntity.notFound().build());
-//            dizimista = dizimistaResponseEntity.getBody();
-//        }
 
         else if (searchBy.isEmpty() || searchBy.isBlank()) {
             Optional<Dizimista> dizimistaServiceById = dizimistaService.findById(Long.valueOf(id));

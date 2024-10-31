@@ -7,6 +7,7 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://pedrodavi.com:32678/postgres}
     password: ${DATABASE_PASSWORD:pedev}
   jpa:
+    open-in-view: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none

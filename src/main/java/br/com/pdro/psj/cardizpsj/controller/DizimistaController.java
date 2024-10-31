@@ -1,22 +1,15 @@
 package br.com.pdro.psj.cardizpsj.controller;
 
-import br.com.pdro.psj.cardizpsj.model.dto.DizimistaResponseDTO;
 import br.com.pdro.psj.cardizpsj.model.entity.Dizimista;
 import br.com.pdro.psj.cardizpsj.service.DizimistaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.sql.*;
-import java.time.LocalDate;
 import java.util.List;
+
+import static br.com.pdro.psj.cardizpsj.utils.Validate.isSearchByCode;
 
 @RestController
 @RequestMapping("/tithers")
@@ -26,45 +19,50 @@ public class DizimistaController {
     private DizimistaService dizimistaService;
 
     @GetMapping
-    public List<Dizimista> getAll() {
-        return dizimistaService.findAll();
+    public ResponseEntity<List<Dizimista>> getAll() {
+        if (dizimistaService.findAll().isEmpty()) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(dizimistaService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Dizimista> getById(@PathVariable String id, @RequestParam(value = "searchBy", required = false, defaultValue = "") String searchBy) {
-
-        if (searchBy.equals("code")) {
-            return dizimistaService.findByCode(Long.valueOf(id))
+        if (isSearchByCode(searchBy)) return dizimistaService.findByCode(Long.valueOf(id))
                     .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        } else if (searchBy.isEmpty() || searchBy.isBlank()) {
-            return dizimistaService.findById(Long.valueOf(id))
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        }
-
-        return ResponseEntity.notFound().build();
-
+                    .orElse(ResponseEntity.noContent().build());
+        else return dizimistaService.findById(Long.valueOf(id))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @PostMapping
-    public Dizimista create(@RequestBody Dizimista dizimista) {
-        return dizimistaService.save(dizimista);
+    public ResponseEntity<?> create(@RequestBody Dizimista dizimista) {
+        dizimistaService.findByCode(dizimista.getCod())
+                .map(existingDizimista -> ResponseEntity.badRequest().build());
+        Dizimista saved = dizimistaService.save(dizimista);
+        if (saved != null) return ResponseEntity.status(HttpStatus.CREATED.value()).build();
+        return ResponseEntity.badRequest().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Dizimista> update(@PathVariable Long id, @RequestBody Dizimista dizimista) {
-        return dizimistaService.findById(id)
+    public ResponseEntity<Dizimista> update(@PathVariable String id, @RequestBody Dizimista dizimista, @RequestParam(value = "searchBy", required = false, defaultValue = "") String searchBy) {
+        if (isSearchByCode(searchBy)) return dizimistaService.findByCode(Long.valueOf(id))
                 .map(existingDizimista -> {
                     dizimista.setId(existingDizimista.getId());
                     return ResponseEntity.ok(dizimistaService.save(dizimista));
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.noContent().build());
+        else return dizimistaService.findById(Long.valueOf(id))
+                .map(existingDizimista -> {
+                    dizimista.setId(existingDizimista.getId());
+                    return ResponseEntity.ok(dizimistaService.save(dizimista));
+                })
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        dizimistaService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> delete(@PathVariable String id, @RequestParam(value = "searchBy", required = false, defaultValue = "") String searchBy) {
+        if (isSearchByCode(searchBy) && dizimistaService.findByCode(Long.valueOf(id)).isPresent()) dizimistaService.deleteByCode(Long.valueOf(id));
+        else if (!isSearchByCode(searchBy) && dizimistaService.findById(Long.valueOf(id)).isPresent()) dizimistaService.deleteById(Long.valueOf(id));
+        return ResponseEntity.ok().build();
     }
 }

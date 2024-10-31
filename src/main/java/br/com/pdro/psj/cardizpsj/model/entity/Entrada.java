@@ -30,11 +30,11 @@ public class Entrada {
         this.id = id;
     }
 
-    public Long getDizimista() {
+    public Long getCodDizimista() {
         return codDizimista;
     }
 
-    public void setDizimista(Long codDizimista) {
+    public void setCodDizimista(Long codDizimista) {
         this.codDizimista = codDizimista;
     }
 

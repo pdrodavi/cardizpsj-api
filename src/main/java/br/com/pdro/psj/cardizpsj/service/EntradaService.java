@@ -1,5 +1,6 @@
 package br.com.pdro.psj.cardizpsj.service;
 
+import br.com.pdro.psj.cardizpsj.model.entity.Dizimista;
 import br.com.pdro.psj.cardizpsj.model.entity.Entrada;
 import br.com.pdro.psj.cardizpsj.repository.EntradaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,10 @@ public class EntradaService {
 
     public Optional<Entrada> findById(Long id) {
         return entradaRepository.findById(id);
+    }
+
+    public Optional<Entrada> findByCode(Long cod) {
+        return entradaRepository.findByCodDizimista(cod);
     }
 
     public Entrada save(Entrada entrada) {

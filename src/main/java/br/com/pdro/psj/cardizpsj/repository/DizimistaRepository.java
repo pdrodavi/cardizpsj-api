@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface DizimistaRepository extends JpaRepository<Dizimista, Long> {
 
     Optional<Dizimista> findByCod(Long cod);
+    void deleteByCod(Long cod);
 
 }
