@@ -42,7 +42,7 @@ public class EntradaController {
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Entrada entrada) {
-        if (dizimistaService.findByCode(entrada.getCodDizimista()).isEmpty()) {
+        if (dizimistaService.findByCode(entrada.getCodDizimista()).isPresent()) {
             entrada.setDataPgto(LocalDate.now());
             entrada.setDataRef(LocalDateTime.now());
             Entrada saved = entradaService.save(entrada);
