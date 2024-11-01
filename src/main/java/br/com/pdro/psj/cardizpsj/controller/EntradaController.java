@@ -1,6 +1,7 @@
 package br.com.pdro.psj.cardizpsj.controller;
 
 import br.com.pdro.psj.cardizpsj.model.entity.Entrada;
+import br.com.pdro.psj.cardizpsj.model.entity.Entradas;
 import br.com.pdro.psj.cardizpsj.service.DizimistaService;
 import br.com.pdro.psj.cardizpsj.service.EntradaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +32,24 @@ public class EntradaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Entrada> getById(@PathVariable String id, @RequestParam(value = "searchBy", required = false, defaultValue = "") String searchBy) {
+    public ResponseEntity<List<Entrada>> getById(@PathVariable String id, @RequestParam(value = "searchBy", required = false, defaultValue = "") String searchBy) {
         if (isSearchByCode(searchBy)) return entradaService.findByCode(Long.valueOf(id))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
-        else return entradaService.findById(Long.valueOf(id))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+//        else return entradaService.findById(Long.valueOf(id))
+//                .map(ResponseEntity::ok)
+//                .orElse(ResponseEntity.noContent().build());
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/period/{id}")
+    public ResponseEntity<Entrada> getByPeriod(@PathVariable String id, @RequestParam(value = "year", required = true) String year, @RequestParam(value = "month", required = true) String month) {
+        return entradaService.findByPeriod(Long.valueOf(id), year + "-" + month + "-").map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/period")
+    public ResponseEntity<List<Entradas>> getByAllPeriod(@RequestParam(value = "interval", required = true) String interval) {
+        return entradaService.findByAllPeriod(interval).map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
     }
 
     @PostMapping
